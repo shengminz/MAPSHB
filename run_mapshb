@@ -1,0 +1,67 @@
+grep "ATOM  " input.pdb | grep "      " > aa.pdb
+sed -i '/REMARK/d' aa.pdb
+sed -i '/REVDAT/d' aa.pdb
+sed -i '/CAVEAT/d' aa.pdb
+#sed -i '/  DA /d' aa.pdb
+#sed -i '/  DT /d' aa.pdb
+#sed -i '/  DG /d' aa.pdb
+#sed -i '/  DC /d' aa.pdb
+#sed -i '/ UNK /d' aa.pdb
+#sed -i '/     H /d' aa.pdb
+pdb4amber -i aa.pdb -o amber.pdb -d -p --noter
+echo "source leaprc.protein.ff14SB" >> tleap.in
+echo "source leaprc.DNA.OL15" >> tleap.in
+echo "source leaprc.RNA.OL3" >> tleap.in
+echo "x=loadpdb amber.pdb" >> tleap.in
+echo "saveamberparm x amber.parm amber.rst" >> tleap.in
+echo "quit" >> tleap.in
+tleap -f tleap.in
+echo "parm amber.parm" >> cpptraj.in
+echo "trajin amber.rst" >> cpptraj.in
+echo "hbond dist +3.2 avgout hbond" >> cpptraj.in
+echo "secstruct assignout secstruct" >> cpptraj.in
+echo "run" >> cpptraj.in
+echo "quit" >> cpptraj.in
+cpptraj -i cpptraj.in
+awk -v OFS='\t' 'NR==1{for (i=1;i<=NF;i++)if ($i=="DonorH"){n=i-1;m=NF-(i==NF)}} {for(i=1;i<=NF;i+=1+(i==n))printf "%s%s",$i,i==m?ORS:OFS}' hbond > temp
+awk -v OFS='\t' 'NR==1{for (i=1;i<=NF;i++)if ($i=="Frames"){n=i-1;m=NF-(i==NF)}} {for(i=1;i<=NF;i+=1+(i==n))printf "%s%s",$i,i==m?ORS:OFS}' temp > hbond
+awk -v OFS='\t' 'NR==1{for (i=1;i<=NF;i++)if ($i=="Frac"){n=i-1;m=NF-(i==NF)}} {for(i=1;i<=NF;i+=1+(i==n))printf "%s%s",$i,i==m?ORS:OFS}' hbond > temp
+mv temp hbond
+sed -i '/AvgDist/d' hbond
+find -name hbond | xargs perl -pi -e 's|_|   |g'
+find -name hbond | xargs perl -pi -e 's|@|   |g'
+column -t < hbond > temp
+mv temp hbond
+cut -c 18-26 < aa.pdb > temp
+perl -ne 'print unless $dup{$_}++;' temp > seq_origin
+find -name seq_origin | xargs perl -pi -e 's|HIE|HIS|g'
+find -name seq_origin | xargs perl -pi -e 's|HID|HIS|g'
+find -name seq_origin | xargs perl -pi -e 's|HIP|HIS|g'
+find -name seq_origin | xargs perl -pi -e 's|CYX|CYS|g'
+sed -i '/TER/d' amber.pdb
+sed -i '/END/d' amber.pdb
+cut -c 18-26 < amber.pdb > temp
+perl -ne 'print unless $dup{$_}++;' temp > seq_amber
+find -name seq_amber | xargs perl -pi -e 's|HIE|HIS|g'
+find -name seq_amber | xargs perl -pi -e 's|HID|HIS|g'
+find -name seq_amber | xargs perl -pi -e 's|HIP|HIS|g'
+find -name seq_amber | xargs perl -pi -e 's|CYX|CYS|g'
+sed -i '/^\s*$/d' seq_amber
+a=`wc -l < seq_origin`
+b=`wc -l < seq_amber`
+if [ $a -ne $b ]; then
+	echo "Error 1: Non-Amber-compatible residues marked as ATOM. Please change it into HETATM." > error
+fi
+if [ ! -f error ]; then
+	cut -c 10-19,21-30,32-41,43-52,54-63 < secstruct > temp_ss
+	cp prepare.f90 temp.f90
+	n=`wc -l < hbond`
+	find -name temp.f90 | xargs perl -pi -e 's|seq_number|'$a'|g'
+	find -name temp.f90 | xargs perl -pi -e 's|hb_number|'$n'|g'
+	gfortran temp.f90
+	./a.out
+	cut -c 1-37,42-65,70-108 < output.log > temp
+fi
+rm temp.f90 a.out output.log temp_ss seq_amber seq_origin secstruct cpptraj.in amber* leap.log tleap.in aa.pdb input.pdb hbond
+Rscript boosting_online.r
+rm temp
