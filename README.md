@@ -10,14 +10,21 @@ MAPSHB allows effective predictions of SHBs from a given protein structure. The 
 ### Installation
 1. Clone the repo
 ```bash
-git clone git@github.com:JeffSHF/ColabDock.git
+git clone https://github.com/shengminz/MAPSHB.git
 ```
 2. Install AmberTools23  
-<b>Please refer to [JAX github](https://github.com/google/jax) page to install package corresponding to your CUDA and cudnn version.</b>  
-Example:
 ```bash
-# install jaxlib
-pip install https://storage.googleapis.com/jax-releases/cuda11/jaxlib-0.3.8+cuda11.cudnn805-cp38-none-manylinux2014_x86_64.whl
-# install jax
-pip install jax==0.3.8
+conda create --name AmberTools23
+conda activate AmberTools23
+conda install -c conda-forge ambertools=23
 ```
+3. Install R
+```bash
+conda install -c r r
+conda install -c conda-forge r-gbm
+```
+4. Install Fortran
+```bash
+conda install -c conda-forge gfortran
+```
+
