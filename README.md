@@ -28,3 +28,10 @@ conda install -c conda-forge r-gbm
 conda install -c conda-forge gfortran
 ```
 
+### Run Prediction
+1. Copy input PDB file into working directory
+```bash
+cd /path/to/MAPSHB #Replace /path/to/MAPSHB into the path of the working directory "MAPSHB"
+cp /path/to/input/pdb/file input.pdb #Replace /path/to/input/pdb/file intp the path of the input PDB file
+2. Prediction
+
