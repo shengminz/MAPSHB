@@ -42,5 +42,6 @@ chmod +x run_mapshb
 ./run_mapshb
 ```
 3. Output file
+
 File "predict_result.csv" is the output file.
 
