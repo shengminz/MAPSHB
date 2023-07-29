@@ -7,6 +7,8 @@ MAPSHB allows effective predictions of SHBs from a given protein structure. The 
   <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
 </a> - `Using this Colab notebook to run MAPSHB prediction`
 
+Before using this model, please make sure read the introduction on our website (https://wanggroup.rutgers.edu/mapshb-model/the-mapshb-model).
+
 ### Installation
 1. Clone the repo
 ```bash
