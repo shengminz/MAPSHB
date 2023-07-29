@@ -33,5 +33,12 @@ conda install -c conda-forge gfortran
 ```bash
 cd /path/to/MAPSHB #Replace /path/to/MAPSHB into the path of the working directory "MAPSHB"
 cp /path/to/input/pdb/file input.pdb #Replace /path/to/input/pdb/file intp the path of the input PDB file
+```
 2. Prediction
+```bash
+chmod +x run_mapshb
+./run_mapshb
+```
+3. Output file
+File "predict_result.csv" is the output file.
 
