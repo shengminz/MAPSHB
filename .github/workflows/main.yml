@@ -89,3 +89,10 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: ${{ github.head_ref }}
+
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
+          token: ${{ secrets.SECRET_TOKEN}} 
+      - name: gh login
+        run: echo "${{ secrets.SECRET_TOKEN }}" | gh auth login --with-token
